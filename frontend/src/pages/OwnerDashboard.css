@@ -1,0 +1,9 @@
+/* Reusing some classes from CustomerDashboard, adding specific ones */
+.owner-avatar {
+  background-color: var(--secondary-color);
+}
+
+.owner-badge {
+  background-color: #dcfce7;
+  color: #166534;
+}

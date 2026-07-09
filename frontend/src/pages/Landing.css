@@ -1,0 +1,129 @@
+.landing .hero {
+  background: linear-gradient(135deg, var(--background-dark) 0%, #1e293b 100%);
+  color: var(--text-light);
+  padding: 8rem 0;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  color: #94a3b8;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.section-header {
+  text-align: center;
+  margin: 4rem 0 3rem;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.section-header p {
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.feature-card {
+  background-color: var(--surface);
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card p {
+  color: #64748b;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  background-color: var(--surface);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.step-number {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 2rem;
+  flex-shrink: 0;
+}
+
+.step h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.step p {
+  color: #64748b;
+}
+
+@media (min-width: 768px) {
+  .steps {
+    flex-direction: row;
+  }
+  .step {
+    flex-direction: column;
+    text-align: center;
+  }
+  .step-number {
+    margin-right: 0;
+    margin-bottom: 1.5rem;
+  }
+}

@@ -1,0 +1,57 @@
+.register-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-card {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.register-card h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+}
+
+.register-subtitle {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.register-card form {
+  text-align: left;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.half {
+  flex: 1;
+}
+
+.register-footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.register-footer a {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
