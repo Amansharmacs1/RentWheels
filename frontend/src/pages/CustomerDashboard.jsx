@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -34,7 +35,9 @@ const CustomerDashboard = () => {
             <Card className="action-card">
               <h3>Find a Car</h3>
               <p>Browse our premium selection of vehicles.</p>
-              <Button variant="primary" disabled>Coming Soon</Button>
+              <Link to="/explore" className="btn-full-link" style={{ display: 'block', textDecoration: 'none' }}>
+                <Button variant="primary" isFullWidth>Explore Vehicles</Button>
+              </Link>
             </Card>
             <Card className="action-card">
               <h3>My Bookings</h3>

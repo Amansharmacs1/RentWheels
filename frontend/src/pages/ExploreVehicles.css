@@ -1,0 +1,42 @@
+.explore-header {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.explore-header h2 {
+  font-size: 2rem;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.search-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.explore-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .explore-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .explore-content {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}

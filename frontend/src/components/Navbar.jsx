@@ -19,8 +19,16 @@ const Navbar = () => {
           RentWheels
         </Link>
         <ul className="navbar-links">
+          <li>
+            <Link to="/explore">Explore Vehicles</Link>
+          </li>
           {user ? (
             <>
+              {user.role === 'Owner' && (
+                <li>
+                  <Link to="/my-vehicles">My Vehicles</Link>
+                </li>
+              )}
               <li>
                 <Link to={user.role === 'Owner' ? '/owner-dashboard' : '/customer-dashboard'}>
                   Dashboard

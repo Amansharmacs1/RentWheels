@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -34,7 +35,14 @@ const OwnerDashboard = () => {
             <Card className="action-card">
               <h3>My Garage</h3>
               <p>Manage your listed vehicles and add new ones.</p>
-              <Button variant="primary" disabled>Coming Soon</Button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <Link to="/my-vehicles" style={{ flex: 1, textDecoration: 'none' }}>
+                  <Button variant="secondary" isFullWidth>View All</Button>
+                </Link>
+                <Link to="/add-vehicle" style={{ flex: 1, textDecoration: 'none' }}>
+                  <Button variant="primary" isFullWidth>Add New</Button>
+                </Link>
+              </div>
             </Card>
             <Card className="action-card">
               <h3>Rental Requests</h3>
