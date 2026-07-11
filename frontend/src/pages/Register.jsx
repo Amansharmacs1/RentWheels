@@ -15,7 +15,6 @@ const Register = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'Customer',
   });
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useContext(AuthContext);
@@ -36,17 +35,16 @@ const Register = () => {
 
     try {
       const { confirmPassword, ...registerData } = formData;
+      // Force role to Customer to satisfy backend schema
+      registerData.role = 'Customer';
+      
       const user = await register(registerData);
       
       // Send welcome email
-      await sendWelcomeEmail(user.name, user.email, user.role);
+      await sendWelcomeEmail(user.name, user.email, 'User');
       toast.success('Account created successfully!');
 
-      if (user.role === 'Owner') {
-        navigate('/owner-dashboard');
-      } else {
-        navigate('/customer-dashboard');
-      }
+      navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -111,13 +109,6 @@ const Register = () => {
                   required
                 />
               </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">I want to:</label>
-              <select name="role" className="form-select" value={formData.role} onChange={handleChange}>
-                <option value="Customer">Rent cars (Customer)</option>
-                <option value="Owner">List my cars (Owner)</option>
-              </select>
             </div>
             <Button type="submit" variant="primary" isFullWidth disabled={isLoading}>
               {isLoading ? 'Creating Account...' : 'Create Account'}

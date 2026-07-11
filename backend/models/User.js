@@ -22,9 +22,18 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['Customer', 'Owner'],
+      enum: ['Customer', 'Owner', 'Admin'],
       required: true,
     },
+    accountStatus: {
+      type: String,
+      enum: ['Active', 'Suspended'],
+      default: 'Active',
+    },
+    wishlist: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Vehicle',
+    }],
     profileImage: {
       type: String,
       default: '',

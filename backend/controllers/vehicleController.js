@@ -50,6 +50,9 @@ const getVehicles = async (req, res) => {
     }
 
     // Filters
+    // Public listings only show Verified vehicles
+    query.verificationStatus = 'Verified';
+
     if (type) query.type = type;
     if (brand) query.brand = brand;
     if (fuelType) query.fuelType = fuelType;

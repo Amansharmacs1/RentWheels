@@ -24,24 +24,25 @@ const Navbar = () => {
           </li>
           {user ? (
             <>
-              {user.role === 'Owner' ? (
-                <>
-                  <li>
-                    <Link to="/my-vehicles">My Vehicles</Link>
-                  </li>
-                  <li>
-                    <Link to="/booking-requests">Booking Requests</Link>
-                  </li>
-                </>
-              ) : (
+              <li>
+                <Link to="/my-vehicles">My Vehicles</Link>
+              </li>
+              <li>
+                <Link to="/booking-requests">Booking Requests</Link>
+              </li>
+              <li>
+                <Link to="/my-bookings">My Bookings</Link>
+              </li>
+              {user.role === 'Admin' && (
                 <li>
-                  <Link to="/my-bookings">My Bookings</Link>
+                  <Link to="/admin/dashboard" style={{ color: '#8b5cf6', fontWeight: 'bold' }}>Admin</Link>
                 </li>
               )}
               <li>
-                <Link to={user.role === 'Owner' ? '/owner-dashboard' : '/customer-dashboard'}>
-                  Dashboard
-                </Link>
+                <Link to="/wishlist">Wishlist</Link>
+              </li>
+              <li>
+                <Link to="/dashboard">Dashboard</Link>
               </li>
               <li>
                 <Link to="/profile">Profile</Link>

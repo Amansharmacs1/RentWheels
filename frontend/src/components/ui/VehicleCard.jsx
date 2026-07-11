@@ -2,13 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Card from './Card';
 import Button from './Button';
+import WishlistButton from './WishlistButton';
 import './VehicleCard.css';
 
 const VehicleCard = ({ vehicle, onEdit, onDelete, showActions = false }) => {
   return (
     <Card className="vehicle-card">
-      <div className="vehicle-image-wrapper">
+      <div className="vehicle-image-wrapper" style={{ position: 'relative' }}>
         <img src={vehicle.images[0]} alt={`${vehicle.brand} ${vehicle.model}`} className="vehicle-image" />
+        <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: '50%', display: 'flex', zIndex: 10 }}>
+          <WishlistButton vehicleId={vehicle._id} />
+        </div>
         <span className={`vehicle-badge ${vehicle.availability ? 'badge-available' : 'badge-unavailable'}`}>
           {vehicle.availability ? 'Available' : 'Unavailable'}
         </span>
@@ -18,6 +22,11 @@ const VehicleCard = ({ vehicle, onEdit, onDelete, showActions = false }) => {
         <div className="vehicle-header">
           <h3 className="vehicle-title">{vehicle.brand} {vehicle.model}</h3>
           <span className="vehicle-type">{vehicle.type}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#6b7280' }}>
+          <span style={{ color: '#fbbf24' }}>★</span>
+          <strong>{vehicle.averageRating ? vehicle.averageRating.toFixed(1) : 'New'}</strong>
+          <span>({vehicle.reviewCount || 0} reviews)</span>
         </div>
         
         <div className="vehicle-details">

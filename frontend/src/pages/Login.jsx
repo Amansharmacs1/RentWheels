@@ -23,11 +23,7 @@ const Login = () => {
     try {
       const user = await login(formData.email, formData.password);
       toast.success('Logged in successfully!');
-      if (user.role === 'Owner') {
-        navigate('/owner-dashboard');
-      } else {
-        navigate('/customer-dashboard');
-      }
+      navigate('/dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {

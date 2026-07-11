@@ -7,29 +7,47 @@ import Loader from '../components/ui/Loader';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import BookingForm from '../components/ui/BookingForm';
+import WishlistButton from '../components/ui/WishlistButton';
+import ReviewCard from '../components/ui/ReviewCard';
+import ReviewForm from '../components/ui/ReviewForm';
 import './VehicleDetails.css';
 
 const VehicleDetails = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
   const [vehicle, setVehicle] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [eligibleBookingId, setEligibleBookingId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
 
-  useEffect(() => {
-    const fetchVehicle = async () => {
-      try {
-        const { data } = await api.get(`/vehicles/${id}`);
-        setVehicle(data);
-      } catch (error) {
-        toast.error('Failed to load vehicle details');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchDetails = async () => {
+    try {
+      const [vehicleRes, reviewsRes] = await Promise.all([
+        api.get(`/vehicles/${id}`),
+        api.get(`/reviews/${id}`)
+      ]);
+      setVehicle(vehicleRes.data);
+      setReviews(reviewsRes.data);
 
-    fetchVehicle();
-  }, [id]);
+      if (user) {
+        const myBookingsRes = await api.get('/bookings/my');
+        const completedBookings = myBookingsRes.data.filter(b => b.vehicle._id === id && b.bookingStatus === 'Completed');
+        
+        // Find a booking that doesn't have a review yet
+        const eligible = completedBookings.find(b => !reviewsRes.data.some(r => r.booking === b._id && r.customer._id === user._id));
+        if (eligible) setEligibleBookingId(eligible._id);
+      }
+    } catch (error) {
+      toast.error('Failed to load vehicle details');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDetails();
+  }, [id, user]);
 
   if (isLoading) return <div className="page-wrapper"><Loader /></div>;
   if (!vehicle) return <div className="page-wrapper container" style={{ textAlign: 'center', padding: '4rem 0' }}>Vehicle not found</div>;
@@ -38,13 +56,11 @@ const VehicleDetails = () => {
     <div className="vehicle-details-page page-wrapper">
       <div className="container">
         
-        {/* Breadcrumb */}
         <div style={{ marginBottom: '1rem' }}>
           <Link to="/explore" style={{ color: 'var(--primary-color)' }}>← Back to Explore</Link>
         </div>
 
         <div className="details-grid">
-          {/* Left Column - Images & Details */}
           <div className="details-main">
             <Card className="gallery-card">
               <div className="main-image">
@@ -111,13 +127,45 @@ const VehicleDetails = () => {
               <h3>Description</h3>
               <p>{vehicle.description}</p>
             </Card>
+
+            {/* Reviews Section */}
+            <div style={{ marginTop: '2rem' }}>
+              <h3 style={{ marginBottom: '1rem', color: 'var(--text-dark)' }}>
+                Reviews ({vehicle.reviewCount || 0})
+              </h3>
+              
+              {reviews.length > 0 ? (
+                reviews.map(review => (
+                  <ReviewCard key={review._id} review={review} />
+                ))
+              ) : (
+                <p style={{ color: 'var(--text-light)' }}>No reviews yet. Be the first to review after your trip!</p>
+              )}
+
+              {eligibleBookingId && (
+                <ReviewForm 
+                  bookingId={eligibleBookingId} 
+                  vehicleId={vehicle._id} 
+                  onReviewSubmitted={fetchDetails} 
+                />
+              )}
+            </div>
+
           </div>
 
-          {/* Right Column - Booking Info & Owner */}
           <div className="details-sidebar">
             <Card className="booking-card">
-              <h2 className="title">{vehicle.brand} {vehicle.model}</h2>
-              <div className="type-badge">{vehicle.type}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 className="title" style={{ margin: 0 }}>{vehicle.brand} {vehicle.model}</h2>
+                <WishlistButton vehicleId={vehicle._id} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
+                <span className="type-badge" style={{ margin: 0 }}>{vehicle.type}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.9rem', color: '#6b7280' }}>
+                  <span style={{ color: '#fbbf24' }}>★</span>
+                  <strong>{vehicle.averageRating ? vehicle.averageRating.toFixed(1) : 'New'}</strong>
+                </div>
+              </div>
               
               <div className="price-section">
                 <div className="price-row">

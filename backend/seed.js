@@ -26,6 +26,34 @@ const seedData = async () => {
     );
     console.log('Dummy Owner Verified/Updated');
 
+    // Create Admin User
+    let admin = await User.findOneAndUpdate(
+      { email: 'admin@rentwheels.com' },
+      {
+        name: 'Super Admin',
+        password: hashedPassword,
+        role: 'Admin',
+        phone: '1111111111',
+        accountStatus: 'Active'
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Admin User created (admin@rentwheels.com)');
+
+    // Create Customer User
+    let customer = await User.findOneAndUpdate(
+      { email: 'customer@rentwheels.com' },
+      {
+        name: 'Demo Customer',
+        password: hashedPassword,
+        role: 'Customer',
+        phone: '2222222222',
+        accountStatus: 'Active'
+      },
+      { upsert: true, new: true }
+    );
+    console.log('Customer User created (customer@rentwheels.com)');
+
     // Clear existing vehicles to avoid duplicates during testing (optional, but good for clean slate)
     await Vehicle.deleteMany({ owner: owner._id });
     console.log('Cleared existing dummy vehicles');
@@ -54,7 +82,10 @@ const seedData = async () => {
           '/assets/civic2.jpg',
           '/assets/civic3.jpg'
         ],
-        availability: true
+        availability: true,
+        verificationStatus: 'Verified',
+        verifiedBy: admin._id,
+        verifiedAt: new Date()
       },
       {
         owner: owner._id,
@@ -79,7 +110,10 @@ const seedData = async () => {
           '/assets/fortuner2.jpg',
           '/assets/fortuner3.jpg'
         ],
-        availability: true
+        availability: true,
+        verificationStatus: 'Verified',
+        verifiedBy: admin._id,
+        verifiedAt: new Date()
       },
       {
         owner: owner._id,
@@ -104,7 +138,10 @@ const seedData = async () => {
           '/assets/bullet2.jpg',
           '/assets/bullet3.jpg'
         ],
-        availability: true
+        availability: true,
+        verificationStatus: 'Verified',
+        verifiedBy: admin._id,
+        verifiedAt: new Date()
       }
     ];
 

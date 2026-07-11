@@ -35,6 +35,27 @@ const StatusBadge = ({ status, type = 'booking' }) => {
     }
   }
 
+  const getDisplayText = (status, type) => {
+    if (!status) return 'Unknown';
+    if (type === 'booking') {
+      switch(status) {
+        case 'Pending': return 'Booking: Pending';
+        case 'Accepted': return 'Booking: Approved';
+        case 'Active': return 'Booking: Active';
+        case 'Completed': return 'Booking: Completed';
+        case 'Rejected': return 'Booking: Rejected';
+        case 'Cancelled': return 'Booking: Cancelled';
+        default: return `Booking: ${status}`;
+      }
+    } else {
+      switch(status) {
+        case 'Pending': return 'Payment: Unpaid';
+        case 'Received': return 'Payment: Paid';
+        default: return `Payment: ${status}`;
+      }
+    }
+  };
+
   return (
     <span style={{ 
       padding: '0.25rem 0.75rem', 
@@ -46,7 +67,7 @@ const StatusBadge = ({ status, type = 'booking' }) => {
       justifyContent: 'center',
       ...getStatusStyles(status, type)
     }}>
-      {status}
+      {getDisplayText(status, type)}
     </span>
   );
 };
