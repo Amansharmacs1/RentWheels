@@ -13,6 +13,9 @@ import VehicleDetails from './pages/VehicleDetails';
 import MyVehicles from './pages/MyVehicles';
 import AddVehicle from './pages/AddVehicle';
 import EditVehicle from './pages/EditVehicle';
+import MyBookings from './pages/MyBookings';
+import BookingRequests from './pages/BookingRequests';
+import BookingDetails from './pages/BookingDetails';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
@@ -72,6 +75,33 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Owner']}>
                   <EditVehicle />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/my-bookings" 
+              element={
+                <ProtectedRoute allowedRoles={['Customer']}>
+                  <MyBookings />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/booking-requests" 
+              element={
+                <ProtectedRoute allowedRoles={['Owner']}>
+                  <BookingRequests />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/booking/:id" 
+              element={
+                <ProtectedRoute>
+                  <BookingDetails />
                 </ProtectedRoute>
               } 
             />

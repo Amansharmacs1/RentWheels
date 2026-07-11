@@ -36,7 +36,7 @@ const createVehicle = async (req, res) => {
 // Get all vehicles with filters, search, and sort
 const getVehicles = async (req, res) => {
   try {
-    const { search, type, brand, fuel, transmission, city, minPrice, maxPrice, sort, availability } = req.query;
+    const { search, type, brand, fuelType, transmission, city, minPrice, maxPrice, sort, availability } = req.query;
 
     let query = {};
 
@@ -52,7 +52,7 @@ const getVehicles = async (req, res) => {
     // Filters
     if (type) query.type = type;
     if (brand) query.brand = brand;
-    if (fuel) query.fuelType = fuel;
+    if (fuelType) query.fuelType = fuelType;
     if (transmission) query.transmission = transmission;
     if (city) query.city = { $regex: city, $options: 'i' };
     if (availability !== undefined) query.availability = availability === 'true';

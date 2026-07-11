@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { AuthContext } from '../context/AuthContext';
 import Loader from '../components/ui/Loader';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import BookingForm from '../components/ui/BookingForm';
 import './VehicleDetails.css';
 
 const VehicleDetails = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
   const [vehicle, setVehicle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -131,7 +134,7 @@ const VehicleDetails = () => {
                 <strong>₹{vehicle.securityDeposit}</strong>
               </div>
 
-              <Button variant="primary" isFullWidth disabled>Book Now (Coming Soon)</Button>
+              <BookingForm vehicle={vehicle} user={user} />
             </Card>
 
             <Card className="location-card">

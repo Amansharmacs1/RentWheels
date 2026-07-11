@@ -24,9 +24,18 @@ const Navbar = () => {
           </li>
           {user ? (
             <>
-              {user.role === 'Owner' && (
+              {user.role === 'Owner' ? (
+                <>
+                  <li>
+                    <Link to="/my-vehicles">My Vehicles</Link>
+                  </li>
+                  <li>
+                    <Link to="/booking-requests">Booking Requests</Link>
+                  </li>
+                </>
+              ) : (
                 <li>
-                  <Link to="/my-vehicles">My Vehicles</Link>
+                  <Link to="/my-bookings">My Bookings</Link>
                 </li>
               )}
               <li>
