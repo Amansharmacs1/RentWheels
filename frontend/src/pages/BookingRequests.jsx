@@ -6,20 +6,27 @@ import EmptyState from '../components/ui/EmptyState';
 import BookingCard from '../components/ui/BookingCard';
 
 import { sendBookingEmail } from '../services/emailService';
+import Pagination from '../components/ui/Pagination';
+import Skeleton from '../components/ui/Skeleton';
+import Card from '../components/ui/Card';
 
 const BookingRequests = () => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [page]);
 
   const fetchBookings = async () => {
+    setIsLoading(true);
     try {
-      const { data } = await api.get('/bookings/owner');
-      setBookings(data);
+      const { data } = await api.get(`/bookings/owner?page=${page}&limit=5`);
+      setBookings(data.bookings || []);
+      setTotalPages(data.pages || 1);
     } catch (error) {
       toast.error('Failed to load booking requests');
     } finally {
@@ -45,7 +52,8 @@ const BookingRequests = () => {
     try {
       await api.patch(`/bookings/${id}/${action}`);
       toast.success(`Booking ${action}ed successfully`);
-      fetchBookings();
+      if (bookings.length === 1 && page > 1) setPage(page - 1);
+      else fetchBookings();
 
       // Send email to customer based on action
       let subject = '';
@@ -82,32 +90,47 @@ const BookingRequests = () => {
     }
   };
 
-  if (isLoading) return <div className="page-wrapper"><Loader /></div>;
-
   return (
-    <div className="page-wrapper container">
+    <div className="page-wrapper container page-enter page-enter-active">
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ marginBottom: '0.5rem' }}>Booking Requests</h1>
         <p style={{ color: '#4b5563', margin: 0 }}>Manage booking requests for your vehicles.</p>
       </div>
 
-      {bookings.length === 0 ? (
-        <EmptyState 
-          title="No booking requests yet" 
-          message="When customers book your vehicles, their requests will appear here."
-        />
-      ) : (
+      {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {bookings.map(booking => (
-            <BookingCard 
-              key={booking._id} 
-              booking={booking} 
-              isOwnerView={true} 
-              onAction={handleAction}
-              actionLoadingId={actionLoadingId}
-            />
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="glass-panel" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '1.5rem' }}>
+                <Skeleton type="image" className="w-1/4" style={{ height: '100px' }} />
+                <div style={{ flex: 1 }}>
+                  <Skeleton type="title" />
+                  <Skeleton type="text" count={2} />
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
+      ) : bookings.length === 0 ? (
+        <EmptyState 
+          title="No booking requests yet" 
+          description="When customers book your vehicles, their requests will appear here."
+        />
+      ) : (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {bookings.map(booking => (
+              <BookingCard 
+                key={booking._id} 
+                booking={booking} 
+                isOwnerView={true} 
+                onAction={handleAction}
+                actionLoadingId={actionLoadingId}
+              />
+            ))}
+          </div>
+          <Pagination page={page} pages={totalPages} onPageChange={setPage} />
+        </>
       )}
     </div>
   );

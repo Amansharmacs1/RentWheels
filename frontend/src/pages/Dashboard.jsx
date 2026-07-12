@@ -24,9 +24,9 @@ const Dashboard = () => {
           api.get('/wishlist')
         ]);
         setStats({
-          bookings: bookingsRes.data,
-          vehicles: vehiclesRes.data,
-          wishlist: wishlistRes.data
+          bookings: bookingsRes.data.bookings || [],
+          vehicles: vehiclesRes.data.vehicles || [],
+          wishlist: wishlistRes.data || []
         });
       } catch (error) {
         console.error('Failed to load dashboard data');

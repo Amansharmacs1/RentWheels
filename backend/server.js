@@ -17,6 +17,19 @@ dotenv.config();
 const app = express();
 
 const path = require('path');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const rateLimit = require('express-rate-limit');
+
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Important for loading external images/resources
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // limit each IP to 1000 requests per windowMs
+  message: { message: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+app.use('/api/', apiLimiter);
 
 app.use(cors());
 app.use(express.json());

@@ -126,6 +126,24 @@ const BookingDetails = () => {
               </div>
             </div>
           </Card>
+
+          {booking.timeline && booking.timeline.length > 0 && (
+            <Card className="p-6">
+              <h3 style={{ marginBottom: '1rem' }}>Booking Timeline</h3>
+              <div className="timeline-container">
+                {booking.timeline.map((event, idx) => (
+                  <div key={idx} className="timeline-event">
+                    <div className="timeline-marker"></div>
+                    <div className="timeline-content">
+                      <div className="timeline-status">{event.status}</div>
+                      <div className="timeline-date">{new Date(event.date).toLocaleString()}</div>
+                      {event.note && <div className="timeline-note">{event.note}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
     </div>

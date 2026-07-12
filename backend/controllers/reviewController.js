@@ -63,11 +63,24 @@ const createReview = async (req, res) => {
 // Get reviews for a vehicle
 const getVehicleReviews = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Review.countDocuments({ vehicle: req.params.vehicleId });
     const reviews = await Review.find({ vehicle: req.params.vehicleId })
       .populate('customer', 'name profileImage')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
 
-    res.json(reviews);
+    res.json({
+      reviews,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }

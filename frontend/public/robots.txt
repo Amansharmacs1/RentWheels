@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /my-bookings
+Disallow: /my-vehicles
+Disallow: /booking-requests
+
+Sitemap: https://rentwheels.example.com/sitemap.xml

@@ -93,6 +93,14 @@ const vehicleSchema = new mongoose.Schema(
       required: true,
       default: true,
     },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+    featuredImage: {
+      type: String,
+      default: '',
+    },
     verificationStatus: {
       type: String,
       enum: ['Pending', 'Verified', 'Rejected'],

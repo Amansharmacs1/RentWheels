@@ -27,30 +27,38 @@ const AdminDashboard = () => {
   if (isLoading) return <div className="page-wrapper"><Loader /></div>;
   if (!stats) return null;
 
-  const mockGrowthData = [
-    { name: 'Jan', users: Math.round(stats.users.total * 0.2) },
-    { name: 'Feb', users: Math.round(stats.users.total * 0.4) },
-    { name: 'Mar', users: Math.round(stats.users.total * 0.6) },
-    { name: 'Apr', users: Math.round(stats.users.total * 0.8) },
-    { name: 'May', users: stats.users.total },
-  ];
-
-  const mockRevenueData = [
-    { name: 'Jan', amount: Math.round(stats.revenue * 0.1) },
-    { name: 'Feb', amount: Math.round(stats.revenue * 0.2) },
-    { name: 'Mar', amount: Math.round(stats.revenue * 0.3) },
-    { name: 'Apr', amount: Math.round(stats.revenue * 0.4) },
-    { name: 'May', amount: stats.revenue },
-  ];
+  const handleExport = (type) => {
+    const token = localStorage.getItem('token');
+    window.open(`http://localhost:5000/api/admin/reports/${type}/csv?token=${token}`, '_blank');
+    // Note: Since we are using token in localStorage, a better way for production is to fetch as blob and trigger download:
+    api.get(`/admin/reports/${type}/csv`, { responseType: 'blob' })
+      .then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${type}_report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      })
+      .catch(() => toast.error('Failed to export report'));
+  };
 
   return (
-    <div className="page-wrapper" style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', padding: '2rem' }}>
+    <div className="page-wrapper page-enter page-enter-active" style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', padding: '2rem' }}>
       <AdminSidebar />
       <div className="admin-content">
-        <h2 style={{ marginBottom: '2rem', color: 'var(--text-dark)' }}>Admin Dashboard</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <h2 style={{ margin: 0, color: 'var(--text-dark)' }}>Admin Dashboard</h2>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button onClick={() => handleExport('users')} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Export Users</button>
+            <button onClick={() => handleExport('vehicles')} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Export Vehicles</button>
+            <button onClick={() => handleExport('bookings')} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Export Bookings</button>
+          </div>
+        </div>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <Card style={{ padding: '1.5rem', textAlign: 'center' }}>
+          <Card className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#6b7280' }}>Total Users</h4>
             <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: 'var(--primary-color)' }}>{stats.users.total}</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.5rem', fontSize: '0.9rem' }}>
@@ -59,7 +67,7 @@ const AdminDashboard = () => {
             </div>
           </Card>
 
-          <Card style={{ padding: '1.5rem', textAlign: 'center' }}>
+          <Card className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#6b7280' }}>Total Vehicles</h4>
             <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: 'var(--primary-color)' }}>{stats.vehicles.total}</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.5rem', fontSize: '0.9rem' }}>
@@ -68,12 +76,12 @@ const AdminDashboard = () => {
             </div>
           </Card>
 
-          <Card style={{ padding: '1.5rem', textAlign: 'center' }}>
+          <Card className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#6b7280' }}>Active Bookings</h4>
             <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: 0, color: '#10b981' }}>{stats.bookings.active}</p>
           </Card>
 
-          <Card style={{ padding: '1.5rem', textAlign: 'center' }}>
+          <Card className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h4 style={{ margin: '0 0 0.5rem 0', color: '#6b7280' }}>Total Revenue (Est)</h4>
             <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0 0 0', color: '#8b5cf6' }}>₹{stats.revenue.toLocaleString()}</p>
           </Card>
@@ -81,19 +89,19 @@ const AdminDashboard = () => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           <AnalyticsChart 
-            title="User Growth (Simulated)" 
+            title="Booking Trends (Last 6 Months)" 
             type="line" 
-            data={mockGrowthData} 
+            data={stats.monthlyData || []} 
             xKey="name" 
-            yKey="users" 
+            yKey="bookings" 
             color="var(--primary-color)" 
           />
           <AnalyticsChart 
-            title="Monthly Revenue (Simulated)" 
+            title="Monthly Revenue" 
             type="bar" 
-            data={mockRevenueData} 
+            data={stats.monthlyData || []} 
             xKey="name" 
-            yKey="amount" 
+            yKey="revenue" 
             color="#8b5cf6" 
           />
         </div>

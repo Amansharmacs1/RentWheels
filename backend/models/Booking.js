@@ -68,6 +68,12 @@ const bookingSchema = new mongoose.Schema(
       default: 'Offline',
       enum: ['Offline'],
     },
+    timeline: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

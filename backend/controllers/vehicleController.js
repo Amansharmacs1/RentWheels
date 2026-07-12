@@ -36,9 +36,9 @@ const createVehicle = async (req, res) => {
 // Get all vehicles with filters, search, and sort
 const getVehicles = async (req, res) => {
   try {
-    const { search, type, brand, fuelType, transmission, city, minPrice, maxPrice, sort, availability } = req.query;
+    const { search, type, brand, fuelType, transmission, city, minPrice, maxPrice, sort, availability, page = 1, limit = 10 } = req.query;
 
-    let query = {};
+    let query = { isArchived: false };
 
     // Search by brand, model, or city
     if (search) {
@@ -74,11 +74,23 @@ const getVehicles = async (req, res) => {
     else if (sort === 'oldest') sortOption = { createdAt: 1 };
     else sortOption = { createdAt: -1 }; // Default newest
 
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Vehicle.countDocuments(query);
     const vehicles = await Vehicle.find(query)
       .populate('owner', 'name profileImage') // Only get owner name and image
-      .sort(sortOption);
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNumber);
 
-    res.json(vehicles);
+    res.json({
+      vehicles,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }
@@ -150,8 +162,28 @@ const deleteVehicle = async (req, res) => {
 // Get vehicles of logged-in owner
 const getMyVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find({ owner: req.user._id }).sort({ createdAt: -1 });
-    res.json(vehicles);
+    const { page = 1, limit = 10, isArchived } = req.query;
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const query = { owner: req.user._id };
+    if (isArchived !== undefined) {
+      query.isArchived = isArchived === 'true';
+    }
+
+    const total = await Vehicle.countDocuments(query);
+    const vehicles = await Vehicle.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.json({
+      vehicles,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }

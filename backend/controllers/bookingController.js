@@ -78,7 +78,8 @@ const createBooking = async (req, res) => {
       rentalDays: diffDays,
       rentalCost,
       securityDeposit: vehicle.securityDeposit,
-      grandTotal
+      grandTotal,
+      timeline: [{ status: 'Created' }]
     });
 
     await booking.populate('owner', 'name email');
@@ -97,11 +98,25 @@ const createBooking = async (req, res) => {
 // @access  Private
 const getMyBookings = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Booking.countDocuments({ customer: req.user._id });
     const bookings = await Booking.find({ customer: req.user._id })
       .populate('vehicle', 'brand model images type pricePerDay pricePerHour')
       .populate('owner', 'name phone email')
-      .sort({ createdAt: -1 });
-    res.json(bookings);
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.json({
+      bookings,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     console.error('getMyBookings Error:', error);
     res.status(500).json({ message: error.message || 'Server Error' });
@@ -113,11 +128,25 @@ const getMyBookings = async (req, res) => {
 // @access  Private
 const getOwnerBookings = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Booking.countDocuments({ owner: req.user._id });
     const bookings = await Booking.find({ owner: req.user._id })
       .populate('vehicle', 'brand model images type registrationNumber')
       .populate('customer', 'name email phone')
-      .sort({ createdAt: -1 });
-    res.json(bookings);
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.json({
+      bookings,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     console.error('getOwnerBookings Error:', error);
     res.status(500).json({ message: error.message || 'Server Error' });
@@ -170,6 +199,7 @@ const cancelBooking = async (req, res) => {
     }
 
     booking.bookingStatus = 'Cancelled';
+    booking.timeline.push({ status: 'Cancelled' });
     await booking.save();
 
     res.json(booking);
@@ -198,6 +228,7 @@ const acceptBooking = async (req, res) => {
     }
 
     booking.bookingStatus = 'Accepted';
+    booking.timeline.push({ status: 'Accepted' });
     await booking.save();
 
     res.json(booking);
@@ -226,6 +257,7 @@ const rejectBooking = async (req, res) => {
     }
 
     booking.bookingStatus = 'Rejected';
+    booking.timeline.push({ status: 'Rejected' });
     await booking.save();
 
     res.json(booking);
@@ -254,9 +286,11 @@ const markPaymentReceived = async (req, res) => {
     }
 
     booking.paymentStatus = 'Received';
+    booking.timeline.push({ status: 'Payment Received' });
     // If payment is received, booking becomes active if it was accepted
     if (booking.bookingStatus === 'Accepted') {
       booking.bookingStatus = 'Active';
+      booking.timeline.push({ status: 'Active' });
     }
     await booking.save();
 
@@ -286,6 +320,7 @@ const completeBooking = async (req, res) => {
     }
 
     booking.bookingStatus = 'Completed';
+    booking.timeline.push({ status: 'Completed' });
     await booking.save();
 
     res.json(booking);

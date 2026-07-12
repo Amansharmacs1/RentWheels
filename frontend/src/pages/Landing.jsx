@@ -1,11 +1,16 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import './Landing.css';
 
 const Landing = () => {
   return (
-    <div className="landing">
+    <div className="landing page-enter page-enter-active">
+      <Helmet>
+        <title>RentWheels - Premium Vehicle Rentals</title>
+        <meta name="description" content="Rent premium vehicles from trusted owners or share your own car and earn money. RentWheels makes it seamless." />
+      </Helmet>
       <section className="hero">
         <div className="container hero-content">
           <h1>Experience the Drive of Your Life</h1>

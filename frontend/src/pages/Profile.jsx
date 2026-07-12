@@ -64,8 +64,58 @@ const Profile = () => {
             </div>
           </Card>
 
-          <Card className="profile-content">
+          <Card className="profile-content glass-panel" style={{ flex: 1 }}>
             <h2>Edit Profile</h2>
+            
+            <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem', alignItems: 'center' }}>
+              <div className="avatar profile-avatar" style={{ width: '100px', height: '100px', fontSize: '3rem' }}>
+                {user?.profileImage ? (
+                  <img src={user.profileImage} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                ) : (
+                  user?.name?.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div>
+                <input 
+                  type="file" 
+                  id="profileImage" 
+                  style={{ display: 'none' }} 
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const formData = new FormData();
+                    formData.append('profileImage', file);
+                    const toastId = toast.loading('Uploading profile picture...');
+                    try {
+                      const { data } = await api.post('/users/profile-picture', formData);
+                      toast.success('Profile picture updated!', { id: toastId });
+                      window.location.reload(); // Refresh to get updated user context
+                    } catch (error) {
+                      toast.error('Failed to upload picture', { id: toastId });
+                    }
+                  }}
+                />
+                <Button variant="secondary" onClick={() => document.getElementById('profileImage').click()} style={{ marginRight: '1rem' }}>
+                  Change Picture
+                </Button>
+                {user?.profileImage && (
+                  <Button variant="secondary" onClick={async () => {
+                    if(!window.confirm('Remove profile picture?')) return;
+                    try {
+                      await api.delete('/users/profile-picture');
+                      toast.success('Profile picture removed!');
+                      window.location.reload();
+                    } catch (e) {
+                      toast.error('Failed to remove picture');
+                    }
+                  }}>
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="profile-form">
               <Input
                 label="Full Name"
@@ -98,6 +148,27 @@ const Profile = () => {
               <Button type="submit" variant="primary" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </Button>
+            </form>
+
+            <hr style={{ margin: '2rem 0', borderColor: 'var(--border-color)' }} />
+            
+            <h2>Change Password</h2>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const currentPassword = e.target.currentPassword.value;
+              const newPassword = e.target.newPassword.value;
+              const toastId = toast.loading('Changing password...');
+              try {
+                await api.patch('/users/password', { currentPassword, newPassword });
+                toast.success('Password changed successfully!', { id: toastId });
+                e.target.reset();
+              } catch (error) {
+                toast.error(error.response?.data?.message || 'Failed to change password', { id: toastId });
+              }
+            }} className="profile-form">
+              <Input label="Current Password" type="password" name="currentPassword" required minLength="6" />
+              <Input label="New Password" type="password" name="newPassword" required minLength="6" />
+              <Button type="submit" variant="secondary">Change Password</Button>
             </form>
           </Card>
         </div>

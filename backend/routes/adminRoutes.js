@@ -7,7 +7,8 @@ const {
   getVehicles,
   verifyVehicle,
   rejectVehicle,
-  getBookings
+  getBookings,
+  exportReportsCSV
 } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -27,5 +28,7 @@ router.patch('/vehicles/:id/reject', rejectVehicle);
 
 router.route('/bookings')
   .get(getBookings);
+
+router.get('/reports/:type/csv', exportReportsCSV);
 
 module.exports = router;

@@ -13,23 +13,45 @@ const getDashboardStats = async (req, res) => {
     const verifiedVehicles = await Vehicle.countDocuments({ verificationStatus: 'Verified' });
     const pendingVehicles = await Vehicle.countDocuments({ verificationStatus: 'Pending' });
 
-    const activeBookings = await Booking.countDocuments({ status: 'Active' });
-    const completedBookings = await Booking.countDocuments({ status: 'Completed' });
+    const activeBookings = await Booking.countDocuments({ bookingStatus: 'Active' });
+    const completedBookings = await Booking.countDocuments({ bookingStatus: 'Completed' });
 
     // Estimate Revenue (sum of grandTotal of completed bookings)
     const revenueData = await Booking.aggregate([
-      { $match: { status: 'Completed' } },
+      { $match: { bookingStatus: 'Completed' } },
       { $group: { _id: null, totalRevenue: { $sum: '$grandTotal' } } }
     ]);
     const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
 
-    // Optional: Get chart data (group by month, etc.)
-    // For simplicity, we just return the aggregates
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const monthlyData = await Booking.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo } } },
+      {
+        $group: {
+          _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+          bookings: { $sum: 1 },
+          revenue: { $sum: { $cond: [{ $eq: ["$bookingStatus", "Completed"] }, "$grandTotal", 0] } }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const formattedMonthlyData = monthlyData.map(data => {
+      const date = new Date(data._id.year, data._id.month - 1);
+      return {
+        name: date.toLocaleString('default', { month: 'short' }),
+        bookings: data.bookings,
+        revenue: data.revenue
+      };
+    });
+
     res.json({
       users: { total: totalUsers, customers, owners },
       vehicles: { total: totalVehicles, verified: verifiedVehicles, pending: pendingVehicles },
       bookings: { active: activeBookings, completed: completedBookings },
-      revenue: totalRevenue
+      revenue: totalRevenue,
+      monthlyData: formattedMonthlyData
     });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
@@ -39,7 +61,7 @@ const getDashboardStats = async (req, res) => {
 // Users Management
 const getUsers = async (req, res) => {
   try {
-    const { role, search } = req.query;
+    const { role, search, page = 1, limit = 10 } = req.query;
     let query = {};
     if (role) query.role = role;
     if (search) {
@@ -48,8 +70,23 @@ const getUsers = async (req, res) => {
         { email: { $regex: search, $options: 'i' } }
       ];
     }
-    const users = await User.find(query).select('-password').sort({ createdAt: -1 });
-    res.json(users);
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await User.countDocuments(query);
+    const users = await User.find(query)
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.json({
+      users,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }
@@ -75,7 +112,7 @@ const updateUserStatus = async (req, res) => {
 // Vehicle Management
 const getVehicles = async (req, res) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, page = 1, limit = 10 } = req.query;
     let query = {};
     if (status) query.verificationStatus = status;
     if (search) {
@@ -85,8 +122,23 @@ const getVehicles = async (req, res) => {
         { registrationNumber: { $regex: search, $options: 'i' } }
       ];
     }
-    const vehicles = await Vehicle.find(query).populate('owner', 'name email').sort({ createdAt: -1 });
-    res.json(vehicles);
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Vehicle.countDocuments(query);
+    const vehicles = await Vehicle.find(query)
+      .populate('owner', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    res.json({
+      vehicles,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }
@@ -130,17 +182,66 @@ const rejectVehicle = async (req, res) => {
 // Bookings Management
 const getBookings = async (req, res) => {
   try {
-    const { status } = req.query;
+    const { status, page = 1, limit = 10 } = req.query;
     let query = {};
-    if (status) query.status = status;
+    if (status) query.bookingStatus = status;
     
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const total = await Booking.countDocuments(query);
     const bookings = await Booking.find(query)
       .populate('customer', 'name email')
       .populate('owner', 'name email')
       .populate('vehicle', 'brand model type')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
       
-    res.json(bookings);
+    res.json({
+      bookings,
+      page: pageNumber,
+      pages: Math.ceil(total / limitNumber),
+      total
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const { parse } = require('json2csv');
+
+const exportReportsCSV = async (req, res) => {
+  try {
+    const { type } = req.params;
+    let data = [];
+    let fields = [];
+
+    if (type === 'users') {
+      const users = await User.find({}).lean();
+      data = users;
+      fields = ['name', 'email', 'phone', 'role', 'accountStatus', 'createdAt'];
+    } else if (type === 'vehicles') {
+      const vehicles = await Vehicle.find({}).populate('owner', 'name').lean();
+      data = vehicles.map(v => ({ ...v, ownerName: v.owner ? v.owner.name : 'Unknown' }));
+      fields = ['brand', 'model', 'type', 'pricePerDay', 'verificationStatus', 'ownerName'];
+    } else if (type === 'bookings') {
+      const bookings = await Booking.find({}).populate('customer', 'name').populate('vehicle', 'brand model').lean();
+      data = bookings.map(b => ({
+        ...b,
+        customerName: b.customer ? b.customer.name : 'Unknown',
+        vehicleDetails: b.vehicle ? `${b.vehicle.brand} ${b.vehicle.model}` : 'Unknown'
+      }));
+      fields = ['customerName', 'vehicleDetails', 'pickupDate', 'returnDate', 'grandTotal', 'bookingStatus'];
+    } else {
+      return res.status(400).json({ message: 'Invalid report type' });
+    }
+
+    const csv = parse(data, { fields });
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`${type}_report.csv`);
+    return res.send(csv);
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }
@@ -153,5 +254,6 @@ module.exports = {
   getVehicles,
   verifyVehicle,
   rejectVehicle,
-  getBookings
+  getBookings,
+  exportReportsCSV
 };
