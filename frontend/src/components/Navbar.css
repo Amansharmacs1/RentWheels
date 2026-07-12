@@ -1,11 +1,11 @@
 .navbar {
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border-color);
+  background-color: #0d0f12; /* Dark theme */
+  border-bottom: 1px solid rgba(0, 229, 255, 0.1);
   padding: 1rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .navbar-container {
@@ -17,7 +17,8 @@
 .navbar-logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: #ffffff;
+  letter-spacing: 1px;
 }
 
 .navbar-links {
@@ -28,12 +29,28 @@
 
 .navbar-links a {
   font-weight: 500;
-  color: var(--text-dark);
-  transition: var(--transition);
+  color: #a0aec0;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
 }
 
 .navbar-links a:hover {
-  color: var(--primary-color);
+  color: #00e5ff; /* Cyan accent */
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+/* Update buttons in navbar */
+.navbar-links .btn-secondary {
+  color: #00e5ff;
+  border-color: rgba(0, 229, 255, 0.5);
+}
+.navbar-links .btn-secondary:hover {
+  background-color: rgba(0, 229, 255, 0.1);
+}
+.navbar-links .btn-primary {
+  background: linear-gradient(135deg, #00e5ff, #0088ff);
+  color: #000;
+  border: none;
 }
 
 @media (max-width: 768px) {
