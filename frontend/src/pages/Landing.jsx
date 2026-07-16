@@ -1,88 +1,67 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate } from 'react-router-dom';
-import { Car, Zap, CheckCircle, Globe, Headphones, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import Card from '../components/ui/Card';
 import './Landing.css';
 
 const Landing = () => {
-  const navigate = useNavigate();
-
-  const handleExplore = () => {
-    navigate('/explore');
-  };
-
   return (
-    <div className="landing-autolux">
+    <div className="landing page-enter page-enter-active">
       <Helmet>
-        <title>AutoLux - Modern Luxury Car Ecommerce</title>
+        <title>RentWheels - Premium Vehicle Rentals</title>
+        <meta name="description" content="Rent premium vehicles from trusted owners or share your own car and earn money. RentWheels makes it seamless." />
       </Helmet>
-
-      {/* Hero Section */}
-      <section className="al-hero">
-        <h1>Drive the Future</h1>
-        <p>Discover premium cars with cutting-edge technology</p>
-        <div className="al-hero-buttons">
-          <button className="al-btn al-btn-outline" onClick={handleExplore}>Explore Models</button>
-          <button className="al-btn al-btn-solid" onClick={handleExplore}>Book Test Drive</button>
-        </div>
-      </section>
-
-      {/* Featured Categories */}
-      <section className="al-section">
-        <h2 className="al-section-title">Featured Categories</h2>
-        <div className="al-categories-grid">
-          <div className="al-category-card" onClick={handleExplore}>
-            <Car />
-            <h3>SUV</h3>
-          </div>
-          <div className="al-category-card" onClick={handleExplore}>
-            <Car />
-            <h3>Sedan</h3>
-          </div>
-          <div className="al-category-card" onClick={handleExplore}>
-            <Car />
-            <h3>Sports</h3>
-          </div>
-          <div className="al-category-card" onClick={handleExplore}>
-            <Zap />
-            <h3>Electric</h3>
-          </div>
-          <div className="al-category-card" onClick={handleExplore}>
-            <Zap />
-            <h3>Hybrid</h3>
+      <section className="hero">
+        <div className="container hero-content">
+          <h1>Experience the Drive of Your Life</h1>
+          <p>Rent premium vehicles from trusted owners or share your own car and earn money. RentWheels makes it seamless.</p>
+          <div className="hero-buttons">
+            <Link to="/register" className="btn btn-primary">Get Started</Link>
+            <Link to="/login" className="btn btn-secondary">Login</Link>
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="al-section">
-        <h2 className="al-section-title">Why Choose RentWheels</h2>
-        <div className="al-perks" style={{ justifyContent: 'space-around' }}>
-          <div className="al-perk"><CheckCircle size={24} /> Verified Owners</div>
-          <div className="al-perk"><Shield size={24} /> Secure Payments</div>
-          <div className="al-perk"><Headphones size={24} /> 24/7 Support</div>
-          <div className="al-perk"><Globe size={24} /> Flexible Rentals</div>
+      <section className="features container">
+        <div className="section-header">
+          <h2>Why Choose Us</h2>
+          <p>We provide the best service in the industry</p>
+        </div>
+        <div className="features-grid">
+          <Card className="feature-card">
+            <h3>Premium Selection</h3>
+            <p>Access a wide range of top-tier vehicles for any occasion.</p>
+          </Card>
+          <Card className="feature-card">
+            <h3>Secure & Safe</h3>
+            <p>Your safety is our priority with verified owners and secure payments.</p>
+          </Card>
+          <Card className="feature-card">
+            <h3>Flexible Rentals</h3>
+            <p>Rent for a day, a week, or a month. Total flexibility for your needs.</p>
+          </Card>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="al-section">
-        <h2 className="al-section-title">How It Works</h2>
-        <div className="al-categories-grid" style={{ gap: '3rem' }}>
-          <div style={{ textAlign: 'center', maxWidth: '250px' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--autolux-cyan)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '0 auto 1rem' }}>1</div>
-            <h3 style={{ marginBottom: '0.5rem' }}>Sign Up</h3>
-            <p style={{ color: 'var(--autolux-text-secondary)', fontSize: '0.9rem' }}>Create your account as a Customer or an Owner in minutes.</p>
+      <section className="how-it-works container">
+        <div className="section-header">
+          <h2>How RentWheels Works</h2>
+        </div>
+        <div className="steps">
+          <div className="step">
+            <div className="step-number">1</div>
+            <h3>Sign Up</h3>
+            <p>Create your account as a Customer or an Owner in minutes.</p>
           </div>
-          <div style={{ textAlign: 'center', maxWidth: '250px' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--autolux-cyan)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '0 auto 1rem' }}>2</div>
-            <h3 style={{ marginBottom: '0.5rem' }}>Find or List</h3>
-            <p style={{ color: 'var(--autolux-text-secondary)', fontSize: '0.9rem' }}>Browse available vehicles or list your own car for rent.</p>
+          <div className="step">
+            <div className="step-number">2</div>
+            <h3>Find or List</h3>
+            <p>Browse available cars or list your own vehicle for rent.</p>
           </div>
-          <div style={{ textAlign: 'center', maxWidth: '250px' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--autolux-cyan)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '0 auto 1rem' }}>3</div>
-            <h3 style={{ marginBottom: '0.5rem' }}>Hit the Road</h3>
-            <p style={{ color: 'var(--autolux-text-secondary)', fontSize: '0.9rem' }}>Book securely, grab the keys, and enjoy your drive.</p>
+          <div className="step">
+            <div className="step-number">3</div>
+            <h3>Hit the Road</h3>
+            <p>Book securely and enjoy your premium driving experience.</p>
           </div>
         </div>
       </section>
