@@ -159,7 +159,7 @@ const Profile = () => {
               const newPassword = e.target.newPassword.value;
               const toastId = toast.loading('Changing password...');
               try {
-                await api.patch('/users/password', { currentPassword, newPassword });
+                await api.put('/users/change-password', { currentPassword, newPassword });
                 toast.success('Password changed successfully!', { id: toastId });
                 e.target.reset();
               } catch (error) {
