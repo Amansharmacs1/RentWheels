@@ -14,7 +14,7 @@ router.post('/', protect, (req, res) => {
       return res.status(400).json({ message: 'No files uploaded' });
     }
 
-    const urls = req.files.map(file => `http://localhost:5001/uploads/${file.filename}`);
+    const urls = req.files.map(file => file.path);
 
     res.json({
       message: 'Images uploaded successfully',
