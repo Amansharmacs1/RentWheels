@@ -104,7 +104,7 @@ const vehicleSchema = new mongoose.Schema(
     verificationStatus: {
       type: String,
       enum: ['Pending', 'Verified', 'Rejected'],
-      default: 'Pending',
+      default: 'Verified',
     },
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
