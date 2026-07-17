@@ -53,6 +53,76 @@ const VehicleForm = ({ initialData, onSubmit, isLoading }) => {
   return (
     <form onSubmit={handleSubmit} className="vehicle-form">
       <div className="form-section">
+        <h3>Basic Details</h3>
+        <div className="form-grid">
+          <div className="form-group">
+            <label className="form-label">Vehicle Type</label>
+            <select name="type" className="form-input" value={formData.type} onChange={handleChange} required>
+              <option value="Car">Car</option>
+              <option value="Bike">Bike</option>
+            </select>
+          </div>
+          <Input label="Brand" name="brand" value={formData.brand} onChange={handleChange} placeholder="e.g., Toyota, Honda" required />
+          <Input label="Model" name="model" value={formData.model} onChange={handleChange} placeholder="e.g., Camry, CBR" required />
+          <Input label="Year" type="number" name="year" value={formData.year} onChange={handleChange} placeholder="e.g., 2022" required />
+          <Input label="Registration Number" name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} placeholder="e.g., MH 12 AB 1234" required />
+        </div>
+      </div>
+
+      <div className="form-section">
+        <h3>Specifications</h3>
+        <div className="form-grid">
+          <div className="form-group">
+            <label className="form-label">Fuel Type</label>
+            <select name="fuelType" className="form-input" value={formData.fuelType} onChange={handleChange} required>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Transmission</label>
+            <select name="transmission" className="form-input" value={formData.transmission} onChange={handleChange} required>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+          {formData.type === 'Car' ? (
+            <Input label="Seating Capacity" type="number" name="seatingCapacity" value={formData.seatingCapacity} onChange={handleChange} placeholder="e.g., 5" required />
+          ) : (
+            <Input label="Engine Capacity (cc)" type="number" name="engineCapacity" value={formData.engineCapacity} onChange={handleChange} placeholder="e.g., 350" required />
+          )}
+        </div>
+      </div>
+
+      <div className="form-section">
+        <h3>Pricing & Security</h3>
+        <div className="form-grid">
+          <Input label="Price per Hour (₹)" type="number" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} required />
+          <Input label="Price per Day (₹)" type="number" name="pricePerDay" value={formData.pricePerDay} onChange={handleChange} required />
+          <Input label="Security Deposit (₹)" type="number" name="securityDeposit" value={formData.securityDeposit} onChange={handleChange} required />
+        </div>
+      </div>
+
+      <div className="form-section">
+        <h3>Location & Details</h3>
+        <div className="form-grid">
+          <Input label="State" name="state" value={formData.state} onChange={handleChange} placeholder="e.g., Maharashtra" required />
+          <Input label="City" name="city" value={formData.city} onChange={handleChange} placeholder="e.g., Pune" required />
+          <Input label="Insurance Valid Till" type="date" name="insuranceValidTill" value={formData.insuranceValidTill} onChange={handleChange} required />
+        </div>
+        <div className="form-group" style={{ marginTop: '1rem' }}>
+          <label className="form-label">Pickup Address</label>
+          <textarea name="pickupAddress" className="form-input" rows="2" value={formData.pickupAddress} onChange={handleChange} required></textarea>
+        </div>
+        <div className="form-group" style={{ marginTop: '1rem' }}>
+          <label className="form-label">Description</label>
+          <textarea name="description" className="form-input" rows="4" value={formData.description} onChange={handleChange} placeholder="Describe your vehicle..." required></textarea>
+        </div>
+      </div>
+
+      <div className="form-section">
         <h3>Images</h3>
         <ImageUploader 
           existingImages={formData.images} 
