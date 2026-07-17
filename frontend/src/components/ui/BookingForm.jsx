@@ -110,8 +110,7 @@ const BookingForm = ({ vehicle, user }) => {
         'Booking Request Submitted',
         `Your booking request for ${newBooking.vehicle.brand} ${newBooking.vehicle.model} has been submitted to the owner. You will be notified once they respond.`
       );
-
-      navigate('/customer-dashboard');
+      navigate('/my-bookings');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to submit booking', { id: loadingToast });
     } finally {

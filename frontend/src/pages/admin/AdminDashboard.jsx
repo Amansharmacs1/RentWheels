@@ -28,8 +28,6 @@ const AdminDashboard = () => {
   if (!stats) return null;
 
   const handleExport = (type) => {
-    const token = localStorage.getItem('token');
-    window.open(`http://localhost:5000/api/admin/reports/${type}/csv?token=${token}`, '_blank');
     // Note: Since we are using token in localStorage, a better way for production is to fetch as blob and trigger download:
     api.get(`/admin/reports/${type}/csv`, { responseType: 'blob' })
       .then(response => {
